@@ -1,10 +1,10 @@
 # FastDash H5P Viewer
 
-Admin-only inspector for H5P content on any page. Part of the FastDash Toolkit (FREE module).
+Role-gated inspector for H5P content on any page. Part of the FastDash Toolkit (FREE module).
 
 ## Description
 
-H5P Viewer is an admin-only diagnostic tool that examines H5P content loaded in the browser. On button click, it displays a popup showing the H5P content type, H5P ID, all questions, and all answers (both correct and incorrect) for any H5P element on the current page. Supports nested/child interactions such as Interactive Video and multiple H5P interactions on the same page.
+H5P Viewer is a role-gated diagnostic tool that examines H5P content loaded in the browser. On button click, it displays a popup showing the H5P content type, H5P ID, all questions, and all answers (both correct and incorrect) for any H5P element on the current page. Supports nested/child interactions such as Interactive Video and multiple H5P interactions on the same page.
 
 ## How It Appears (No Shortcode Needed)
 
@@ -18,7 +18,7 @@ On every page that contains H5P content, the plugin injects a floating **"H5P"**
 
 ## Features
 
-- Admin-only access (restricted to administrators)
+- Role-gated access (administrators only by default; configurable per role under **Settings → H5P Viewer**)
 - Inspects H5P content loaded in the browser
 - Displays H5P content type and H5P ID
 - Shows all questions and answers (correct and incorrect)
