@@ -428,6 +428,7 @@
   function buildPanel(allData) {
     var root = document.getElementById('h5p-viewer-root')
     if (!root) return
+    if (!allData || !allData.length) return
     root.innerHTML = ''
     root.setAttribute('aria-hidden', 'false')
 
@@ -701,8 +702,14 @@
 
   function init() {
     if (typeof H5PIntegration === 'undefined' || !H5PIntegration.contents) {
-      // No H5P on this page — still render a panel saying so
-      buildPanel([])
+      return
+    }
+
+    // Only surface the viewer when H5P is actually rendered on the page.
+    // H5PIntegration.contents can be populated by enqueued-but-not-displayed
+    // content (e.g. a LearnDash quiz step on a lesson), which would otherwise
+    // show the button on pages with no visible H5P.
+    if (!document.querySelector('.h5p-content, .h5p-iframe')) {
       return
     }
 

@@ -1,14 +1,112 @@
 <?php
 /**
- * Plugin Name: H5P Viewer - Note: Restricted To Admins.
- * Description: Examines the memory in the browser where H5P questions and answers load then upon button click displays a popup showing H5P content type, H5P ID, questions, answers both correct and incorrect for any H5P on the current page. Supports nested/child interactions such as Interactive Video and multiple H5P Interactions on the same page.
- * Version:     1.0.0
+ * Plugin Name: H5P Viewer
+ * Plugin URI:  https://developer.datavizplus.com/
+ * Description: Role-gated H5P inspector that examines H5P content in the browser and displays content type, ID, questions, and answers (correct and incorrect). Supports nested interactions and multiple H5P on the same page. Configurable visibility by role.
+ * Version:     1.0.1
  * Author:      Patrick Kellogg
  * License:     GPL-2.0+
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
+}
+
+// Bail if the toolkit module is already handling this.
+if ( defined( 'DVP_H5PV_VERSION' ) ) {
+	return;
+}
+
+define( 'DVP_H5PV_VERSION', '1.0.1' );
+
+// ============================================================================
+// Settings Page (standalone only — toolkit uses bootstrap.php)
+// ============================================================================
+
+add_action( 'admin_menu', 'dvp_h5pv_standalone_menu' );
+
+function dvp_h5pv_standalone_menu() {
+	add_options_page(
+		'H5P Viewer Settings',
+		'H5P Viewer',
+		'manage_options',
+		'dvp-h5p-viewer-settings',
+		'dvp_h5pv_standalone_settings_page'
+	);
+}
+
+function dvp_h5pv_standalone_settings_page() {
+	if ( isset( $_POST['dvp_h5pv_nonce'] ) && wp_verify_nonce( $_POST['dvp_h5pv_nonce'], 'dvp_h5pv_save' ) ) {
+		$roles = isset( $_POST['dvp_h5pv_roles'] ) ? array_map( 'sanitize_text_field', (array) $_POST['dvp_h5pv_roles'] ) : array( 'administrator' );
+		update_option( 'dvp_h5pv_allowed_roles', $roles );
+		echo '<div class="notice notice-success is-dismissible"><p>Settings saved.</p></div>';
+	}
+	dvp_h5pv_render_role_settings();
+}
+
+/**
+ * Shared role settings UI used by both standalone and toolkit.
+ */
+function dvp_h5pv_render_role_settings() {
+	$allowed = get_option( 'dvp_h5pv_allowed_roles', array( 'administrator' ) );
+	if ( ! is_array( $allowed ) ) {
+		$allowed = array( 'administrator' );
+	}
+	$all_roles     = wp_roles()->role_names;
+	$danger_roles  = array( 'subscriber', 'customer' );
+	$has_danger    = ! empty( array_intersect( $allowed, $danger_roles ) );
+	?>
+	<div class="wrap">
+		<h1>H5P Viewer</h1>
+		<div class="card" style="max-width:700px;">
+			<h2>Visibility</h2>
+			<p>Select which roles can see the H5P Viewer on the frontend. The viewer exposes H5P content structure, questions, and answers.</p>
+			<form method="post">
+				<?php wp_nonce_field( 'dvp_h5pv_save', 'dvp_h5pv_nonce' ); ?>
+				<fieldset>
+					<?php foreach ( $all_roles as $slug => $label ) :
+						$checked    = in_array( $slug, $allowed, true );
+						$is_danger  = in_array( $slug, $danger_roles, true );
+					?>
+						<label style="display:block;margin:4px 0;<?php echo $is_danger && $checked ? 'color:#d63638;font-weight:600;' : ''; ?>">
+							<input type="checkbox" name="dvp_h5pv_roles[]" value="<?php echo esc_attr( $slug ); ?>" <?php checked( $checked ); ?>>
+							<?php echo esc_html( $label ); ?>
+							<?php if ( $is_danger ) : ?>
+								<span style="color:#d63638;font-size:11px;"> &mdash; exposes answers to learners</span>
+							<?php endif; ?>
+						</label>
+					<?php endforeach; ?>
+				</fieldset>
+
+				<?php if ( $has_danger ) : ?>
+					<div style="margin:12px 0;padding:10px 14px;background:#fcf0f1;border:1px solid #d63638;border-radius:4px;">
+						<strong style="color:#d63638;">&#9888; Danger Zone:</strong>
+						<span style="color:#d63638;">A basic user role is selected. Learners will be able to see all H5P questions and correct answers on any page they visit.</span>
+					</div>
+				<?php endif; ?>
+
+				<?php submit_button( 'Save Settings' ); ?>
+			</form>
+		</div>
+	</div>
+	<?php
+}
+
+/**
+ * Check if the current user has one of the allowed roles.
+ */
+function dvp_h5pv_user_can_view() {
+	if ( ! is_user_logged_in() ) {
+		return false;
+	}
+
+	$allowed = get_option( 'dvp_h5pv_allowed_roles', array( 'administrator' ) );
+	if ( ! is_array( $allowed ) || empty( $allowed ) ) {
+		return dvp_h5pv_user_can_view();
+	}
+
+	$user = wp_get_current_user();
+	return ! empty( array_intersect( $user->roles, $allowed ) );
 }
 
 class H5P_Viewer {
@@ -20,11 +118,10 @@ class H5P_Viewer {
 	}
 
 	/**
-	 * Only load the inspector for logged-in users with edit capabilities.
-	 * Remove/widen the capability check if you need it visible to all users.
+	 * Check if the viewer should load for the current user.
 	 */
 	private function should_load() {
-		return current_user_can( 'manage_options' );
+		return dvp_h5pv_user_can_view();
 	}
 
 	public function enqueue_assets() {
@@ -67,7 +164,7 @@ class H5P_Viewer {
 			'methods'             => 'GET',
 			'callback'            => array( $this, 'rest_get_content' ),
 			'permission_callback' => function() {
-				return current_user_can( 'manage_options' );
+				return dvp_h5pv_user_can_view();
 			},
 			'args' => array(
 				'id' => array(
@@ -80,7 +177,7 @@ class H5P_Viewer {
 			'methods'             => 'GET',
 			'callback'            => array( $this, 'rest_get_page_contents' ),
 			'permission_callback' => function() {
-				return current_user_can( 'manage_options' );
+				return dvp_h5pv_user_can_view();
 			},
 			'args' => array(
 				'ids' => array(
