@@ -26,10 +26,6 @@ On every page that contains H5P content, the plugin injects a floating **"H5P"**
 - Supports multiple H5P interactions on the same page
 - Button-triggered popup display
 
-## Toolkit Integration
-
-Also available as the `h5p-viewer` module in `dvp-toolkit-ld` (FREE tier).
-
 ## Requirements
 
 - WordPress 6.0+
