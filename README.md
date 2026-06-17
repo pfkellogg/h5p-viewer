@@ -1,6 +1,6 @@
-# FastDash H5P Viewer
+# H5P Viewer
 
-Role-gated inspector for H5P content on any page. Part of the FastDash Toolkit (FREE module).
+Role-gated inspector for H5P content on any page.
 
 ## Description
 
