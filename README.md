@@ -1,33 +1,23 @@
-# H5P Viewer
+# Viewer for H5P
 
-Role-gated inspector for H5P content on any page.
+![Viewer for H5P](.wordpress-org/banner-772x250.png)
 
-## Description
+A free WordPress plugin: see every question and answer in the H5P content on a page — its content type, its ID, and which answers are right — nested interactions (Interactive Video, Course Presentation, Question Set, Column) included. For course builders and reviewers.
 
-H5P Viewer is a role-gated diagnostic tool that examines H5P content loaded in the browser. On button click, it displays a popup showing the H5P content type, H5P ID, all questions, and all answers (both correct and incorrect) for any H5P element on the current page. Supports nested/child interactions such as Interactive Video and multiple H5P interactions on the same page.
+**Page:** https://aikellogg.com/#/viewer-for-h5p · **Download:** [viewer-for-h5p.zip](https://github.com/pfkellogg/h5p-viewer/releases/latest/download/viewer-for-h5p.zip) · coming soon to the WordPress.org plugin directory.
 
-## How It Appears (No Shortcode Needed)
+## How it appears
 
-The viewer is **not** a shortcode and requires no markup, block, or template change. Once activated, it loads automatically on the frontend for any logged-in user whose role is allowed (administrators only by default — configurable under **Settings → H5P Viewer**).
+No shortcode, block or template change. Once active, a floating **H5P** button (with a badge counting the H5P items) shows in the bottom-right corner of every page that has H5P content, only for logged-in users whose role you allow (administrators by default; **Settings → Viewer for H5P**). Click it for a draggable, resizable panel with each item's type, ID, questions and answers, its xAPI coverage, and the pages that use it.
 
-On every page that contains H5P content, the plugin injects a floating **"H5P"** toggle button fixed to the **bottom-right corner** of the screen. The button carries an amber badge showing how many H5P interactions were found on the page. Clicking it opens a draggable, resizable inspector panel listing each H5P element's type, ID, questions, and answers.
+## Why it matters
 
-- **Auto-injected** via `wp_footer` — nothing to place in content.
-- **Only appears when H5P is present** — if the page has no H5P content, no button shows.
-- **Role-gated** — hidden entirely from users whose role isn't allowed (and from logged-out visitors).
-
-## Features
-
-- Role-gated access (administrators only by default; configurable per role under **Settings → H5P Viewer**)
-- Inspects H5P content loaded in the browser
-- Displays H5P content type and H5P ID
-- Shows all questions and answers (correct and incorrect)
-- Supports nested/child interactions (e.g., Interactive Video)
-- Supports multiple H5P interactions on the same page
-- Button-triggered popup display
+H5P sends every correct answer to each learner's browser. This viewer shows you exactly what they can find. To keep answers on the server, see Secure H5P (a separate, paid plugin).
 
 ## Requirements
 
-- WordPress 6.0+
-- H5P plugin
-- PHP 7.4+
+WordPress 6.0+, PHP 7.4+, and the H5P plugin (Interactive Content – H5P). Tested with WordPress 7.1 on PHP 8.2.
+
+## License
+
+GPL-2.0-or-later. H5P is a registered trademark of H5P Group; this plugin is independent and not made or endorsed by H5P Group.
