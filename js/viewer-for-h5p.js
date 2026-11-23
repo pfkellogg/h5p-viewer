@@ -19,11 +19,15 @@
     return (library || '').split(' ')[0]
   }
 
+  // Text only: parsed into a separate, inert document (nothing in it loads or runs)
   function stripHtml(html) {
-    var tmp = document.createElement('div')
-    tmp.innerHTML = html || ''
-    return tmp.textContent || tmp.innerText || ''
+    if (!html) return ''
+    var doc = new DOMParser().parseFromString(String(html), 'text/html')
+    return (doc.body && doc.body.textContent) || ''
   }
+
+  var I18N = (window.H5PViewerConfig && H5PViewerConfig.i18n) || {}
+  var TITLE = I18N.title || 'Viewer for H5P'
 
   // ─── Per-type question extractors ─────────────────────────────────────────
   // Each extractor receives (params, location) and returns an array of:
@@ -436,7 +440,7 @@
     var toggle = document.createElement('button')
     toggle.id = 'h5p-viewer-toggle'
     toggle.className = 'h5p-viewer-toggle'
-    toggle.title = 'H5P Viewer'
+    toggle.title = TITLE
     toggle.innerHTML = '<span class="h5p-viewer-toggle-icon">H5P</span><span class="h5p-viewer-toggle-badge">' + allData.length + '</span>'
     root.appendChild(toggle)
 
@@ -445,12 +449,12 @@
     panel.id = 'h5p-viewer-panel'
     panel.className = 'h5p-viewer-panel h5p-viewer-panel--closed'
     panel.setAttribute('role', 'dialog')
-    panel.setAttribute('aria-label', 'H5P Viewer')
+    panel.setAttribute('aria-label', TITLE)
     root.appendChild(panel)
 
     // Header
     var header = el('div', 'h5p-viewer-header')
-    header.innerHTML = '<span class="h5p-viewer-title">H5P Viewer</span>'
+    header.innerHTML = '<span class="h5p-viewer-title">' + esc(TITLE) + '</span>'
     var closeBtn = el('button', 'h5p-viewer-close')
     closeBtn.innerHTML = '&times;'
     closeBtn.title = 'Close'
@@ -464,7 +468,7 @@
     _qIdCounter = 0
 
     if (!allData.length) {
-      body.innerHTML = '<p class="h5p-viewer-empty">No H5P content found on this page.</p>'
+      body.innerHTML = '<p class="h5p-viewer-empty">' + esc(I18N.empty || 'No H5P content found on this page.') + '</p>'
     } else if (allData.length === 1) {
       body.appendChild(buildContentBlock(allData[0]))
     } else {
