@@ -636,7 +636,10 @@
       block.appendChild(qSection)
     } else {
       var noQ = el('p', 'h5p-viewer-empty')
-      if (item.childCount) {
+      if (item.secured) {
+        noQ.className = 'h5p-viewer-empty h5p-viewer-secured'
+        noQ.textContent = '\uD83D\uDD12 Secured: the questions and answers aren\'t in this page. They stay on the server (Secure Answers for H5P).'
+      } else if (item.childCount) {
         var childUnit =
           {
             'H5P.InteractiveVideo': 'interaction',
@@ -713,7 +716,8 @@
     // H5PIntegration.contents can be populated by enqueued-but-not-displayed
     // content (e.g. a LearnDash quiz step on a lesson), which would otherwise
     // show the button on pages with no visible H5P.
-    if (!document.querySelector('.h5p-content, .h5p-iframe')) {
+    // (.dvp-secure-h5p: an item secured by Secure Answers for H5P, shown without H5P's frame.)
+    if (!document.querySelector('.h5p-content, .h5p-iframe, .dvp-secure-h5p')) {
       return
     }
 
@@ -758,8 +762,9 @@
         title: cTitle,
         library: library,
         machine_name: mn,
-        questions: params ? extractAll(library, params, topLoc) : [],
-        childCount: childCount
+        questions: params && !c.dvpSecured ? extractAll(library, params, topLoc) : [],
+        childCount: childCount,
+        secured: !!c.dvpSecured
       }
     })
 
@@ -776,7 +781,8 @@
           library: db.library || parsed.library,
           machine_name: db.machine_name || parsed.machine_name,
           questions: parsed.questions || [],
-          childCount: parsed.childCount || 0
+          childCount: parsed.childCount || 0,
+          secured: !!parsed.secured
         })
       })
       buildPanel(

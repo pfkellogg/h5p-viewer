@@ -5,7 +5,7 @@ Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
 Requires Plugins: h5p
-Stable tag: 1.1.0
+Stable tag: 1.1.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -69,6 +69,9 @@ Questions and answers: Multiple Choice, Single Choice Set, True/False, Fill in t
 4. Settings → Viewer for H5P: which roles see it, with a warning for learner roles.
 
 == Changelog ==
+
+= 1.1.1 =
+* Items secured by Secure Answers for H5P are listed too, marked "Secured": their questions and answers aren't in the page.
 
 = 1.1.0 =
 * New name for the WordPress.org directory: Viewer for H5P (was H5P Viewer).
