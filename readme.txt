@@ -51,7 +51,7 @@ It shows only on pages that have H5P content, only to logged-in users with an al
 
 = Can learners see the answers? =
 
-Not unless you allow their role. By default only administrators see the viewer. The answers come from a REST route that checks the same roles, so a learner can't read them by calling it directly either.
+Not in this viewer, unless you allow their role: its panel, and the REST route behind it, check the same roles. But H5P itself sends every correct answer to each learner's browser, where anyone can read it with the browser's developer tools. This viewer shows you exactly what they can find. To keep the answers on the server, see Secure H5P, a separate paid plugin: https://aikellogg.com/#/viewer-for-h5p
 
 = Does it work with LMS plugins? =
 
