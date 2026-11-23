@@ -73,6 +73,7 @@ Questions and answers: Multiple Choice, Single Choice Set, True/False, Fill in t
 = 1.1.0 =
 * New name for the WordPress.org directory: Viewer for H5P (was H5P Viewer).
 * Fixed: a crash when the saved role setting was empty; it now falls back to administrators.
+* Fixed: the server lookup ("Used on" and the item's details) asked H5P's library table for a column it doesn't have, so it always failed.
 * Settings accept only roles that exist on the site, and check the user's permission.
 * "Used on" no longer lists pages that use a different item whose ID starts with the same digits (5 and 50).
 * All text can be translated (text domain viewer-for-h5p).

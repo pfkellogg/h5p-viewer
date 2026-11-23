@@ -233,7 +233,7 @@ class Dvp_H5PV_Viewer {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- the H5P plugin's own tables, read live for an inspector.
 		$row = $wpdb->get_row(
 			$wpdb->prepare(
-				"SELECT c.id, c.title, c.parameters, c.filtered, l.machine_name, l.major_version, l.minor_version
+				"SELECT c.id, c.title, c.parameters, c.filtered, l.name AS machine_name, l.major_version, l.minor_version
 				 FROM {$wpdb->prefix}h5p_contents c
 				 JOIN {$wpdb->prefix}h5p_libraries l ON l.id = c.library_id
 				 WHERE c.id = %d",
