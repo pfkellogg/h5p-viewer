@@ -12,7 +12,7 @@ No shortcode, block or template change. Once active, a floating **H5P** button (
 
 ## Why it matters
 
-H5P sends every correct answer to each learner's browser. This viewer shows you exactly what they can find. To keep answers on the server, see Secure H5P (a separate, paid plugin).
+H5P sends every correct answer to each learner's browser. This viewer shows you exactly what they can find. To keep answers on the server, see Secure Answers for H5P (a separate, paid plugin).
 
 ## Requirements
 
