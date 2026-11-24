@@ -5,7 +5,7 @@ Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
 Requires Plugins: h5p
-Stable tag: 1.1.1
+Stable tag: 1.1.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -69,6 +69,9 @@ Questions and answers: Multiple Choice, Single Choice Set, True/False, Fill in t
 4. Settings → Viewer for H5P: which roles see it, with a warning for learner roles.
 
 == Changelog ==
+
+= 1.1.2 =
+* Each item is checked for the user asking: they can edit everyone's H5P content, or it's their own, or it's in a post they can read. The "used on" list shows only posts they can read (no private or draft titles), and an edit link only where they can edit.
 
 = 1.1.1 =
 * Items secured by Secure Answers for H5P are listed too, marked "Secured": their questions and answers aren't in the page.

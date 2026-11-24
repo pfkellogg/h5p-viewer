@@ -3,7 +3,7 @@
  * Plugin Name:       Viewer for H5P
  * Plugin URI:        https://aikellogg.com/#/viewer-for-h5p
  * Description:       A role-gated inspector for the H5P content on a page: its content type, ID, every question, and every answer (correct and incorrect), nested interactions included. For course builders and reviewers.
- * Version:           1.1.1
+ * Version:           1.1.2
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Requires Plugins:  h5p
@@ -25,7 +25,7 @@ if ( defined( 'DVP_H5PV_VERSION' ) ) {
 	return;
 }
 
-define( 'DVP_H5PV_VERSION', '1.1.1' );
+define( 'DVP_H5PV_VERSION', '1.1.2' );
 define( 'DVP_H5PV_URL', plugin_dir_url( __FILE__ ) );
 define( 'DVP_H5PV_OPTION', 'dvp_h5pv_allowed_roles' );
 
@@ -233,7 +233,7 @@ class Dvp_H5PV_Viewer {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- the H5P plugin's own tables, read live for an inspector.
 		$row = $wpdb->get_row(
 			$wpdb->prepare(
-				"SELECT c.id, c.title, c.parameters, c.filtered, l.name AS machine_name, l.major_version, l.minor_version
+				"SELECT c.id, c.user_id, c.title, c.parameters, c.filtered, l.name AS machine_name, l.major_version, l.minor_version
 				 FROM {$wpdb->prefix}h5p_contents c
 				 JOIN {$wpdb->prefix}h5p_libraries l ON l.id = c.library_id
 				 WHERE c.id = %d",
@@ -243,18 +243,39 @@ class Dvp_H5PV_Viewer {
 		if ( ! $row ) {
 			return null;
 		}
+		$usages = $this->find_content_usages( (int) $row->id );
+		if ( ! $this->can_see_item( $row, $usages ) ) {
+			return false;
+		}
 		return array(
 			'id'           => (int) $row->id,
 			'title'        => $row->title,
 			'library'      => $row->machine_name . ' ' . $row->major_version . '.' . $row->minor_version,
 			'machine_name' => $row->machine_name,
 			'parameters'   => $row->filtered ? $row->filtered : $row->parameters,
-			'usages'       => $this->find_content_usages( (int) $row->id ),
+			'usages'       => $usages,
 		);
+	}
+
+	/**
+	 * This user may see this item: they can edit everyone's H5P content, or it's their own and they can edit H5P content,
+	 * or it's in a post they can read (so it's on a page they can open anyway). `$usages` lists only posts they can read.
+	 */
+	private function can_see_item( $row, $usages ) {
+		if ( current_user_can( 'edit_others_h5p_contents' ) ) {
+			return true;
+		}
+		if ( current_user_can( 'edit_h5p_contents' ) && (int) $row->user_id === get_current_user_id() ) {
+			return true;
+		}
+		return ! empty( $usages );
 	}
 
 	public function rest_get_content( WP_REST_Request $request ) {
 		$data = $this->content( absint( $request->get_param( 'id' ) ) );
+		if ( false === $data ) {
+			return new WP_Error( 'rest_forbidden', __( 'You may not view this H5P content.', 'viewer-for-h5p' ), array( 'status' => rest_authorization_required_code() ) );
+		}
 		if ( ! $data ) {
 			return new WP_Error( 'not_found', __( 'H5P content not found.', 'viewer-for-h5p' ), array( 'status' => 404 ) );
 		}
@@ -309,12 +330,16 @@ class Dvp_H5PV_Viewer {
 			if ( ! preg_match( '/(h5p\s+id=["\']?' . $id . '(?![0-9])|"id":\s*' . $id . '(?![0-9]))/', $post->post_content ) ) {
 				continue;
 			}
+			// only posts this user can read: a private or draft post's title is never shown to someone who can't open it
+			if ( ! current_user_can( 'read_post', (int) $post->ID ) ) {
+				continue;
+			}
 			$usages[] = array(
 				'post_id'     => (int) $post->ID,
 				'post_title'  => $post->post_title,
 				'post_type'   => $post->post_type,
 				'post_status' => $post->post_status,
-				'edit_url'    => get_edit_post_link( $post->ID, 'raw' ),
+				'edit_url'    => current_user_can( 'edit_post', (int) $post->ID ) ? get_edit_post_link( $post->ID, 'raw' ) : '',
 				'view_url'    => get_permalink( $post->ID ),
 			);
 		}
