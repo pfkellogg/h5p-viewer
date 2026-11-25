@@ -1,6 +1,6 @@
-# Viewer for H5P
+# AIKellogg Viewer for H5P
 
-![Viewer for H5P](.wordpress-org/banner-772x250.png)
+![AIKellogg Viewer for H5P](.wordpress-org/banner-772x250.png)
 
 A free WordPress plugin: see every question and answer in the H5P content on a page — its content type, its ID, and which answers are right — nested interactions (Interactive Video, Course Presentation, Question Set, Column) included. For course builders and reviewers.
 
@@ -8,7 +8,7 @@ A free WordPress plugin: see every question and answer in the H5P content on a p
 
 ## How it appears
 
-No shortcode, block or template change. Once active, a floating **H5P** button (with a badge counting the H5P items) shows in the bottom-right corner of every page that has H5P content, only for logged-in users whose role you allow (administrators by default; **Settings → Viewer for H5P**). Click it for a draggable, resizable panel with each item's type, ID, questions and answers, its xAPI coverage, and the pages that use it.
+No shortcode, block or template change. Once active, a floating **H5P** button (with a badge counting the H5P items) shows in the bottom-right corner of every page that has H5P content, only for logged-in users whose role you allow (administrators by default; **Settings → AIKellogg Viewer for H5P**). Click it for a draggable, resizable panel with each item's type, ID, questions and answers, its xAPI coverage, and the pages that use it.
 
 ## Why it matters
 
