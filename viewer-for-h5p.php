@@ -1,9 +1,9 @@
 <?php
 /**
- * Plugin Name:       Viewer for H5P
+ * Plugin Name:       AIKellogg Viewer for H5P
  * Plugin URI:        https://aikellogg.com/#/viewer-for-h5p
  * Description:       A role-gated inspector for the H5P content on a page: its content type, ID, every question, and every answer (correct and incorrect), nested interactions included. For course builders and reviewers.
- * Version:           1.1.2
+ * Version:           1.1.3
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Requires Plugins:  h5p
@@ -11,7 +11,7 @@
  * Author URI:        https://aikellogg.com
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:       viewer-for-h5p
+ * Text Domain:       aikellogg-viewer-for-h5p
  *
  * H5P is a registered trademark of H5P Group. This plugin is not made or endorsed by H5P Group.
  */
@@ -25,7 +25,7 @@ if ( defined( 'DVP_H5PV_VERSION' ) ) {
 	return;
 }
 
-define( 'DVP_H5PV_VERSION', '1.1.2' );
+define( 'DVP_H5PV_VERSION', '1.1.3' );
 define( 'DVP_H5PV_URL', plugin_dir_url( __FILE__ ) );
 define( 'DVP_H5PV_OPTION', 'dvp_h5pv_allowed_roles' );
 
@@ -56,15 +56,15 @@ function dvp_h5pv_user_can_view() {
 }
 
 // ============================================================================
-// Settings: Settings > Viewer for H5P
+// Settings: Settings > AIKellogg Viewer for H5P
 // ============================================================================
 
 add_action( 'admin_menu', 'dvp_h5pv_menu' );
 
 function dvp_h5pv_menu() {
 	add_options_page(
-		__( 'Viewer for H5P', 'viewer-for-h5p' ),
-		__( 'Viewer for H5P', 'viewer-for-h5p' ),
+		__( 'AIKellogg Viewer for H5P', 'aikellogg-viewer-for-h5p' ),
+		__( 'AIKellogg Viewer for H5P', 'aikellogg-viewer-for-h5p' ),
 		'manage_options',
 		'dvp-h5p-viewer-settings',
 		'dvp_h5pv_settings_page'
@@ -75,7 +75,7 @@ add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), 'dvp_h5pv_acti
 
 function dvp_h5pv_action_links( $links ) {
 	$url = admin_url( 'options-general.php?page=dvp-h5p-viewer-settings' );
-	array_unshift( $links, '<a href="' . esc_url( $url ) . '">' . esc_html__( 'Settings', 'viewer-for-h5p' ) . '</a>' );
+	array_unshift( $links, '<a href="' . esc_url( $url ) . '">' . esc_html__( 'Settings', 'aikellogg-viewer-for-h5p' ) . '</a>' );
 	return $links;
 }
 
@@ -94,7 +94,7 @@ function dvp_h5pv_settings_page() {
 			$roles = array( 'administrator' );
 		}
 		update_option( DVP_H5PV_OPTION, $roles );
-		echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'Settings saved.', 'viewer-for-h5p' ) . '</p></div>';
+		echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'Settings saved.', 'aikellogg-viewer-for-h5p' ) . '</p></div>';
 	}
 	dvp_h5pv_render_role_settings();
 }
@@ -109,10 +109,10 @@ function dvp_h5pv_render_role_settings() {
 	$has_danger   = ! empty( array_intersect( $allowed, $danger_roles ) );
 	?>
 	<div class="wrap">
-		<h1><?php esc_html_e( 'Viewer for H5P', 'viewer-for-h5p' ); ?></h1>
+		<h1><?php esc_html_e( 'AIKellogg Viewer for H5P', 'aikellogg-viewer-for-h5p' ); ?></h1>
 		<div class="card" style="max-width:700px;">
-			<h2><?php esc_html_e( 'Visibility', 'viewer-for-h5p' ); ?></h2>
-			<p><?php esc_html_e( 'Choose which roles see the viewer on the front end. It shows the structure of the H5P content on a page, with its questions and answers.', 'viewer-for-h5p' ); ?></p>
+			<h2><?php esc_html_e( 'Visibility', 'aikellogg-viewer-for-h5p' ); ?></h2>
+			<p><?php esc_html_e( 'Choose which roles see the viewer on the front end. It shows the structure of the H5P content on a page, with its questions and answers.', 'aikellogg-viewer-for-h5p' ); ?></p>
 			<form method="post">
 				<?php wp_nonce_field( 'dvp_h5pv_save', 'dvp_h5pv_nonce' ); ?>
 				<fieldset>
@@ -125,7 +125,7 @@ function dvp_h5pv_render_role_settings() {
 							<input type="checkbox" name="dvp_h5pv_roles[]" value="<?php echo esc_attr( $slug ); ?>" <?php checked( $checked ); ?>>
 							<?php echo esc_html( translate_user_role( $label ) ); ?>
 							<?php if ( $is_danger ) : ?>
-								<span style="color:#d63638;font-size:11px;"> &mdash; <?php esc_html_e( 'shows answers to learners', 'viewer-for-h5p' ); ?></span>
+								<span style="color:#d63638;font-size:11px;"> &mdash; <?php esc_html_e( 'shows answers to learners', 'aikellogg-viewer-for-h5p' ); ?></span>
 							<?php endif; ?>
 						</label>
 					<?php endforeach; ?>
@@ -133,12 +133,12 @@ function dvp_h5pv_render_role_settings() {
 
 				<?php if ( $has_danger ) : ?>
 					<div style="margin:12px 0;padding:10px 14px;background:#fcf0f1;border:1px solid #d63638;border-radius:4px;">
-						<strong style="color:#d63638;">&#9888; <?php esc_html_e( 'Careful:', 'viewer-for-h5p' ); ?></strong>
-						<span style="color:#d63638;"><?php esc_html_e( 'A learner role is selected. Learners will see every H5P question and its correct answers on any page they visit.', 'viewer-for-h5p' ); ?></span>
+						<strong style="color:#d63638;">&#9888; <?php esc_html_e( 'Careful:', 'aikellogg-viewer-for-h5p' ); ?></strong>
+						<span style="color:#d63638;"><?php esc_html_e( 'A learner role is selected. Learners will see every H5P question and its correct answers on any page they visit.', 'aikellogg-viewer-for-h5p' ); ?></span>
 					</div>
 				<?php endif; ?>
 
-				<?php submit_button( __( 'Save Settings', 'viewer-for-h5p' ) ); ?>
+				<?php submit_button( __( 'Save Settings', 'aikellogg-viewer-for-h5p' ) ); ?>
 			</form>
 		</div>
 	</div>
@@ -174,8 +174,8 @@ class Dvp_H5PV_Viewer {
 				'pageId'  => get_the_ID(),
 				'siteUrl' => get_site_url(),
 				'i18n'    => array(
-					'title' => __( 'Viewer for H5P', 'viewer-for-h5p' ),
-					'empty' => __( 'No H5P content found on this page.', 'viewer-for-h5p' ),
+					'title' => __( 'AIKellogg Viewer for H5P', 'aikellogg-viewer-for-h5p' ),
+					'empty' => __( 'No H5P content found on this page.', 'aikellogg-viewer-for-h5p' ),
 				),
 			)
 		);
@@ -274,10 +274,10 @@ class Dvp_H5PV_Viewer {
 	public function rest_get_content( WP_REST_Request $request ) {
 		$data = $this->content( absint( $request->get_param( 'id' ) ) );
 		if ( false === $data ) {
-			return new WP_Error( 'rest_forbidden', __( 'You may not view this H5P content.', 'viewer-for-h5p' ), array( 'status' => rest_authorization_required_code() ) );
+			return new WP_Error( 'rest_forbidden', __( 'You may not view this H5P content.', 'aikellogg-viewer-for-h5p' ), array( 'status' => rest_authorization_required_code() ) );
 		}
 		if ( ! $data ) {
-			return new WP_Error( 'not_found', __( 'H5P content not found.', 'viewer-for-h5p' ), array( 'status' => 404 ) );
+			return new WP_Error( 'not_found', __( 'H5P content not found.', 'aikellogg-viewer-for-h5p' ), array( 'status' => 404 ) );
 		}
 		return rest_ensure_response( $data );
 	}

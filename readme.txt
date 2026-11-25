@@ -1,11 +1,11 @@
-=== Viewer for H5P ===
+=== AIKellogg Viewer for H5P ===
 Contributors: pfkellogg
 Tags: h5p, quiz, answers, lms, elearning
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
 Requires Plugins: h5p
-Stable tag: 1.1.2
+Stable tag: 1.1.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -13,7 +13,7 @@ See every question and answer in the H5P content on a page: its type, its ID, an
 
 == Description ==
 
-Viewer for H5P is an inspector for the H5P content on your pages. Open any page or lesson that has H5P on it and a small **H5P** button appears in the bottom-right corner, with a badge counting the H5P items it found. Click it for a panel that lists, for each item:
+AIKellogg Viewer for H5P is an inspector for the H5P content on your pages. Open any page or lesson that has H5P on it and a small **H5P** button appears in the bottom-right corner, with a badge counting the H5P items it found. Click it for a panel that lists, for each item:
 
 * its **content type** (Multiple Choice, True/False, Fill in the Blanks, Interactive Video, ...) and **H5P ID**
 * every **question**, with **every answer**, the correct ones marked
@@ -23,7 +23,7 @@ Viewer for H5P is an inspector for the H5P content on your pages. Open any page 
 
 It needs no shortcode, block or template change: once it's active, the button shows on every page that has H5P content, and only there.
 
-**Who sees it:** only logged-in users with a role you allow, administrators by default. Choose the roles under **Settings → Viewer for H5P**. If you allow a learner role (Subscriber, Customer, Student), the settings page warns you: those users would see the correct answers.
+**Who sees it:** only logged-in users with a role you allow, administrators by default. Choose the roles under **Settings → AIKellogg Viewer for H5P**. If you allow a learner role (Subscriber, Customer, Student), the settings page warns you: those users would see the correct answers.
 
 Handy for:
 
@@ -39,15 +39,15 @@ H5P is a registered trademark of H5P Group. This plugin is independent: it is no
 == Installation ==
 
 1. Install and activate the **H5P** plugin (Interactive Content - H5P) if you haven't.
-2. Install **Viewer for H5P** from **Plugins → Add New**, or upload the zip, and activate it.
-3. Optional: choose who sees it under **Settings → Viewer for H5P** (administrators by default).
+2. Install **AIKellogg Viewer for H5P** from **Plugins → Add New**, or upload the zip, and activate it.
+3. Optional: choose who sees it under **Settings → AIKellogg Viewer for H5P** (administrators by default).
 4. Open any page with H5P content while logged in: the **H5P** button is in the bottom-right corner.
 
 == Frequently Asked Questions ==
 
 = I don't see the button =
 
-It shows only on pages that have H5P content, only to logged-in users with an allowed role. Check **Settings → Viewer for H5P**, and that you're logged in with one of those roles.
+It shows only on pages that have H5P content, only to logged-in users with an allowed role. Check **Settings → AIKellogg Viewer for H5P**, and that you're logged in with one of those roles.
 
 = Can learners see the answers? =
 
@@ -66,9 +66,12 @@ Questions and answers: Multiple Choice, Single Choice Set, True/False, Fill in t
 1. The H5P button, bottom right, with the number of H5P items on the page.
 2. The panel: each item's type, ID, questions and answers, the correct ones marked.
 3. Questions inside an Interactive Video, with their times.
-4. Settings → Viewer for H5P: which roles see it, with a warning for learner roles.
+4. Settings → AIKellogg Viewer for H5P: which roles see it, with a warning for learner roles.
 
 == Changelog ==
+
+= 1.1.3 =
+* New name for the WordPress.org directory: AIKellogg Viewer for H5P (address aikellogg-viewer-for-h5p); text domain to match.
 
 = 1.1.2 =
 * Each item is checked for the user asking: they can edit everyone's H5P content, or it's their own, or it's in a post they can read. The "used on" list shows only posts they can read (no private or draft titles), and an edit link only where they can edit.
