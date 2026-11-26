@@ -5,7 +5,7 @@ Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
 Requires Plugins: h5p
-Stable tag: 1.1.3
+Stable tag: 1.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -59,7 +59,7 @@ Yes: it looks at the page, so it works wherever H5P content is shown: LearnDash,
 
 = Which content types does it understand? =
 
-Questions and answers: Multiple Choice, Single Choice Set, True/False, Fill in the Blanks, Drag and Drop, Mark the Words, Summary, Flashcards and Image Hotspot Question, including when they sit inside Interactive Video, Course Presentation, Question Set or Column. Other types still show their type, ID, title and where they're used.
+Questions and answers for every H5P type that has right answers: Multiple Choice, Single Choice Set, True/False, Fill in the Blanks, Advanced Fill in the Blanks, Drag and Drop, Drag the Words, Mark the Words, Summary, Flashcards, Dialog Cards, Image Choice, Find the Hotspot, Find Multiple Hotspots, Sort the Paragraphs, Image Sequencing (the right order), Dictation, Crossword, Find the Words, Guess the Answer, Speak the Words, Essay (its keywords and sample answer), Image Pairing and Memory Game, including when they sit inside Interactive Video, Course Presentation, Question Set, Column, Branching Scenario, Accordion, Interactive Book, Game Map or Image Hotspots. Types with no right answers (Questionnaire, Arithmetic Quiz, Timeline) still show their type, ID, title and where they're used.
 
 == Screenshots ==
 
@@ -69,6 +69,11 @@ Questions and answers: Multiple Choice, Single Choice Set, True/False, Fill in t
 4. Settings → AIKellogg Viewer for H5P: which roles see it, with a warning for learner roles.
 
 == Changelog ==
+
+= 1.2.0 =
+* Every H5P type with right answers is now shown: Drag the Words, Advanced Fill in the Blanks, Image Choice, Essay keywords, Dictation, Sort the Paragraphs, Image Sequencing, Find Multiple Hotspots, Crossword, Find the Words, Guess the Answer, Speak the Words, Dialog Cards, Image Pairing and Memory Game.
+* Looks inside Interactive Book, Game Map and Image Hotspots too.
+* Find the Hotspot now lists every hotspot and where it is; Fill in the Blanks hides tips and feedback from the answers.
 
 = 1.1.3 =
 * New name for the WordPress.org directory: AIKellogg Viewer for H5P (address aikellogg-viewer-for-h5p); text domain to match.
@@ -95,6 +100,9 @@ Questions and answers: Multiple Choice, Single Choice Set, True/False, Fill in t
 * First version.
 
 == Upgrade Notice ==
+
+= 1.2.0 =
+Shows the answers of every H5P type that has right answers, also inside Interactive Book, Game Map and Image Hotspots.
 
 = 1.1.0 =
 Fixes a crash with an empty role setting. New name: Viewer for H5P.

@@ -3,7 +3,7 @@
  * Plugin Name:       AIKellogg Viewer for H5P
  * Plugin URI:        https://aikellogg.com/#/viewer-for-h5p
  * Description:       A role-gated inspector for the H5P content on a page: its content type, ID, every question, and every answer (correct and incorrect), nested interactions included. For course builders and reviewers.
- * Version:           1.1.3
+ * Version:           1.2.0
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Requires Plugins:  h5p
@@ -25,7 +25,7 @@ if ( defined( 'DVP_H5PV_VERSION' ) ) {
 	return;
 }
 
-define( 'DVP_H5PV_VERSION', '1.1.3' );
+define( 'DVP_H5PV_VERSION', '1.2.0' );
 define( 'DVP_H5PV_URL', plugin_dir_url( __FILE__ ) );
 define( 'DVP_H5PV_OPTION', 'dvp_h5pv_allowed_roles' );
 

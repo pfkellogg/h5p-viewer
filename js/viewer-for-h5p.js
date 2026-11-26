@@ -71,8 +71,8 @@
         m
       while ((m = re.exec(rawQ)) !== null) {
         // multiple accepted: slash-separated
-        m[1].split('/').forEach(function (a) {
-          answers.push({ text: a.trim(), correct: true })
+        starAnswers(m[1]).forEach(function (a) {
+          answers.push({ text: a, correct: true })
         })
       }
       return {
@@ -177,18 +177,159 @@
     })
   }
 
-  // H5P.ImageHotspotQuestion
+  // ─── More question types (field names from each type's semantics.json) ────
+
+  // "*answer/other:tip*" or "*answer\+right feedback\-wrong feedback:tip*" -> ["answer", "other"]
+  function starAnswers(inner) {
+    var s = String(inner || '')
+    var colon = s.search(/(^|[^\\]):/)
+    if (colon !== -1) s = s.slice(0, colon + (s[colon] === ':' ? 0 : 1))
+    s = s.replace(/\\[+-][\s\S]*$/, '')
+    return s.split('/').map(function (a) { return stripHtml(a.replace(/\\:/g, ':')).trim() }).filter(Boolean)
+  }
+  function starTexts(html) {
+    var out = [], re = /\*([^*]+)\*/g, m
+    while ((m = re.exec(String(html || ''))) !== null) out.push(m[1])
+    return out
+  }
+  function inOrder(list, toText) {
+    return list.map(function (x, i) { return { text: (i + 1) + '. ' + toText(x), correct: true } })
+  }
+  function mediaAlt(lib) {
+    var p = (lib && lib.params) || {}
+    return stripHtml(p.alt || p.title || (lib && lib.metadata && lib.metadata.title) || '')
+  }
+
+  // H5P.DragText (Drag the Words)
+  extractors['H5P.DragText'] = function (params, loc) {
+    var answers = []
+    starTexts(params.textField).forEach(function (inner) {
+      starAnswers(inner).forEach(function (a) { answers.push({ text: a, correct: true }) })
+    })
+    String(params.distractors || '').replace(/\*([^*]+)\*/g, function (_, d) {
+      answers.push({ text: stripHtml(d), correct: false }); return ''
+    })
+    var body = stripHtml(String(params.textField || '').replace(/\*[^*]+\*/g, '_____'))
+    var task = stripHtml(params.taskDescription || '')
+    return [{ location: loc, question: task ? task + ' — ' + body : body, answers: answers, type: 'Drag the Words' }]
+  }
+
+  // H5P.AdvancedBlanks
+  extractors['H5P.AdvancedBlanks'] = function (params, loc) {
+    var c = params.content || {}
+    var text = stripHtml(c.blanksText || '')
+    return (c.blanksList || []).map(function (b, i) {
+      var answers = String(b.correctAnswerText || '').split('/').map(function (a) {
+        return { text: stripHtml(a).trim(), correct: true }
+      }).filter(function (a) { return a.text })
+      ;(b.incorrectAnswersList || []).forEach(function (w) {
+        if (w && w.incorrectAnswerText) answers.push({ text: stripHtml(w.incorrectAnswerText), correct: false })
+      })
+      return { location: loc + ' › Blank ' + (i + 1), question: stripHtml(c.task || '') || text, answers: answers, type: 'Advanced Fill in the Blanks' }
+    })
+  }
+
+  // H5P.MultiMediaChoice (Image Choice)
+  extractors['H5P.MultiMediaChoice'] = function (params, loc) {
+    var answers = (params.options || []).map(function (o, i) {
+      return { text: mediaAlt(o.media) || 'Option ' + (i + 1), correct: !!o.correct }
+    })
+    return [{ location: loc, question: stripHtml(params.question || ''), answers: answers, type: 'Image Choice' }]
+  }
+
+  // H5P.Essay: the keywords it looks for, and the sample answer
+  extractors['H5P.Essay'] = function (params, loc) {
+    var answers = (params.keywords || []).map(function (k) {
+      var alts = (k.alternatives || []).filter(Boolean)
+      var pts = k.options && k.options.points ? ' (' + k.options.points + ' pt)' : ''
+      return { text: stripHtml(k.keyword || '') + (alts.length ? ' / ' + alts.map(stripHtml).join(' / ') : '') + pts, correct: true }
+    })
+    var sample = stripHtml((params.solution && params.solution.sample) || '')
+    if (sample) answers.push({ text: 'Sample answer: ' + sample, correct: true })
+    return [{ location: loc, question: stripHtml(params.taskDescription || ''), answers: answers, type: 'Essay (keywords)' }]
+  }
+
+  // H5P.Dictation
+  extractors['H5P.Dictation'] = function (params, loc) {
+    return (params.sentences || []).map(function (s, i) {
+      return { location: loc + ' › Sentence ' + (i + 1), question: stripHtml(s.description || params.taskDescription || ''), answers: [{ text: stripHtml(s.text || ''), correct: true }], type: 'Dictation' }
+    })
+  }
+
+  // H5P.SortParagraphs: the paragraphs are stored in the right order
+  extractors['H5P.SortParagraphs'] = function (params, loc) {
+    return [{ location: loc, question: stripHtml(params.taskDescription || ''), answers: inOrder(params.paragraphs || [], stripHtml), type: 'Sort the Paragraphs (right order)' }]
+  }
+
+  // H5P.ImageSequencing: the images are stored in the right order
+  extractors['H5P.ImageSequencing'] = function (params, loc) {
+    return [{ location: loc, question: stripHtml(params.taskDescription || ''), answers: inOrder(params.sequenceImages || [], function (s) { return stripHtml(s.imageDescription || '') || 'Image' }), type: 'Image Sequencing (right order)' }]
+  }
+
+  // H5P.ImageHotspotQuestion (Find the Hotspot) and H5P.ImageMultipleHotspotQuestion (Find Multiple Hotspots)
+  function hotspotItems(settings, loc, type) {
+    var hs = (settings && settings.hotspot) || []
+    var answers = hs.map(function (h, i) {
+      var c = h.computedSettings || {}
+      var where = c.x !== undefined ? ' at ' + Math.round(c.x) + '% across, ' + Math.round(c.y) + '% down' + (c.figure ? ' (' + c.figure + ')' : '') : ''
+      return { text: 'Hotspot ' + (i + 1) + where, correct: !!(h.userSettings && h.userSettings.correct) }
+    })
+    var q = stripHtml((settings && settings.taskDescription) || 'Find the hotspot')
+    if (settings && settings.numberHotspots) q += ' (find ' + settings.numberHotspots + ')'
+    return [{ location: loc, question: q, answers: answers, type: type }]
+  }
   extractors['H5P.ImageHotspotQuestion'] = function (params, loc) {
-    var q = stripHtml(((params.taskDescription || {}).params && params.taskDescription.params.text) || 'Click on the correct hotspot')
-    var hs = params.imageHotspotQuestion || {}
-    return [
-      {
-        location: loc,
-        question: q,
-        answers: [{ text: 'Hotspot ' + ((hs.hotspot || {}).i || 1) + ' is correct', correct: true }],
-        type: 'Image Hotspot'
-      }
-    ]
+    var s = (params.imageHotspotQuestion && params.imageHotspotQuestion.hotspotSettings) || {}
+    return hotspotItems(s, loc, 'Find the Hotspot')
+  }
+  extractors['H5P.ImageMultipleHotspotQuestion'] = function (params, loc) {
+    var s = (params.imageMultipleHotspotQuestion && params.imageMultipleHotspotQuestion.hotspotSettings) || {}
+    return hotspotItems(s, loc, 'Find Multiple Hotspots')
+  }
+
+  // H5P.Crossword
+  extractors['H5P.Crossword'] = function (params, loc) {
+    return (params.words || []).map(function (w, i) {
+      return { location: loc + ' › Word ' + (i + 1) + (w.orientation ? ' (' + w.orientation + ')' : ''), question: stripHtml(w.clue || ''), answers: [{ text: stripHtml(w.answer || ''), correct: true }], type: 'Crossword' }
+    })
+  }
+
+  // H5P.FindTheWords
+  extractors['H5P.FindTheWords'] = function (params, loc) {
+    var words = String(params.wordList || '').split(',').map(function (w) { return stripHtml(w).trim() }).filter(Boolean)
+    return [{ location: loc, question: stripHtml(params.taskDescription || ''), answers: words.map(function (w) { return { text: w, correct: true } }), type: 'Find the Words' }]
+  }
+
+  // H5P.GuessTheAnswer
+  extractors['H5P.GuessTheAnswer'] = function (params, loc) {
+    return [{ location: loc, question: stripHtml(params.taskDescription || ''), answers: [{ text: stripHtml(params.solutionText || ''), correct: true }], type: 'Guess the Answer' }]
+  }
+
+  // H5P.SpeakTheWords
+  extractors['H5P.SpeakTheWords'] = function (params, loc) {
+    return [{ location: loc, question: stripHtml(params.question || ''), answers: (params.acceptedAnswers || []).map(function (a) { return { text: stripHtml(a), correct: true } }), type: 'Speak the Words' }]
+  }
+
+  // H5P.Dialogcards: front and back of each card
+  extractors['H5P.Dialogcards'] = function (params, loc) {
+    return (params.dialogs || []).map(function (d, i) {
+      return { location: loc + ' › Card ' + (i + 1), question: stripHtml(d.text || ''), answers: [{ text: stripHtml(d.answer || ''), correct: true }], type: 'Dialog Cards' }
+    })
+  }
+
+  // H5P.ImagePair and H5P.MemoryGame: which pictures go together
+  function pairItems(cards, loc, type, intro) {
+    return (cards || []).map(function (c, i) {
+      var a = stripHtml(c.imageAlt || '') || 'Image ' + (i + 1)
+      var b = stripHtml(c.matchAlt || '') || (c.match ? 'its matching image' : 'the same image')
+      return { location: loc + ' › Pair ' + (i + 1), question: intro, answers: [{ text: a + ' ↔ ' + b + (c.description ? ' — ' + stripHtml(c.description) : ''), correct: true }], type: type }
+    })
+  }
+  extractors['H5P.ImagePair'] = function (params, loc) {
+    return pairItems(params.cards, loc, 'Image Pairing', stripHtml(params.taskDescription || 'Match the pairs'))
+  }
+  extractors['H5P.MemoryGame'] = function (params, loc) {
+    return pairItems(params.cards, loc, 'Memory Game', 'Matching pair')
   }
 
   // ─── Container / composite type parsers ───────────────────────────────────
@@ -337,6 +478,46 @@
         var pParams = safeJson(panel.content.params) || panel.content.params || {}
         var pLoc = location + ' › Panel "' + stripHtml(panel.title || idx + 1) + '"'
         results = results.concat(extractAll(pLib, pParams, pLoc))
+      })
+      return results
+    }
+
+    // ── H5P.InteractiveBook: chapters are Columns ─────────────────────────
+    if (mn === 'H5P.InteractiveBook') {
+      ;(params.chapters || []).forEach(function (ch, idx) {
+        var lib = (ch && ch.chapter) || ch || {}
+        var cParams = safeJson(lib.params) || lib.params || {}
+        var title = (lib.metadata && lib.metadata.title) || 'Page ' + (idx + 1)
+        results = results.concat(extractAll(lib.library || 'H5P.Column', cParams, location + ' › ' + stripHtml(title)))
+      })
+      return results
+    }
+
+    // ── H5P.GameMap: stages hold content (elements as a list or keyed by id) ──
+    if (mn === 'H5P.GameMap') {
+      var vals = function (x) { return Array.isArray(x) ? x : x && typeof x === 'object' ? Object.keys(x).map(function (k) { return x[k] }) : [] }
+      var maps = vals(params.gamemaps)
+      if (params.gamemapSteps && params.gamemapSteps.gamemap) maps.push(params.gamemapSteps.gamemap)
+      maps.forEach(function (gm) {
+        vals(gm && gm.elements).forEach(function (st, si) {
+          var label = stripHtml(st.label || 'Stage ' + (si + 1))
+          vals(st.contentsList).forEach(function (c) {
+            var ct = c && c.contentType
+            if (!ct || !ct.library) return
+            results = results.concat(extractAll(ct.library, safeJson(ct.params) || ct.params || {}, location + ' › ' + label))
+          })
+        })
+      })
+      return results
+    }
+
+    // ── H5P.ImageHotspots: each hotspot's content ─────────────────────────
+    if (mn === 'H5P.ImageHotspots') {
+      ;(params.hotspots || []).forEach(function (h, hi) {
+        ;(h.content || []).forEach(function (c) {
+          if (!c || !c.library) return
+          results = results.concat(extractAll(c.library, safeJson(c.params) || c.params || {}, location + ' › Hotspot ' + (hi + 1) + (h.header ? ' "' + stripHtml(h.header) + '"' : '')))
+        })
       })
       return results
     }
